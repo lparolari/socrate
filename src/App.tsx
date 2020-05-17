@@ -1,7 +1,13 @@
 import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import { Screens } from "./screens/Screens";
 
 function App() {
-  return <p>Test</p>;
+  return (
+    <BrowserRouter>
+      <Screens />
+    </BrowserRouter>
+  );
 }
 
 export default App;
