@@ -1,10 +1,13 @@
-import { InformationEvent } from "http";
-
 export interface Item {
-  id: number;
   timestamp: moment.Moment;
-  in: boolean;
-  info: InformationEvent;
 }
 
+export interface ItemIn extends Item {}
+
+export interface ItemOut extends Item {}
+
 export interface Info {}
+
+export interface Threshold {
+  threshold: number;
+}
