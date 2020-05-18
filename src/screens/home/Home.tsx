@@ -176,7 +176,7 @@ const Summary = ({ data }: { data: Item[] }) => {
                   <Typography>Media ultima ora</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography>{meanLastHour(data)}</Typography>
+                  <Typography>{meanLastHour(data).toFixed(2)}</Typography>
                 </TableCell>
               </TableRow>
             </TableBody>
