@@ -1,6 +1,4 @@
 import React, { useContext, useState } from "react";
-import { Switch, withRouter } from "react-router-dom";
-import { Route } from "react-router-dom";
 import { ThresholdContext } from "../../providers/threshold";
 import { Typography } from "@material-ui/core";
 import { Paper } from "@material-ui/core";

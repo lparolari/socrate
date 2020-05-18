@@ -110,7 +110,6 @@ const TotalCounter = ({ total }: { total: number }) => {
 };
 
 const HistPerHour = ({ data }: { data: HistEntry[] }) => {
-  const classes = useStyles();
   const theme = useTheme();
 
   return (
@@ -274,9 +273,6 @@ const buildHist = (minutes: number[]): HistEntry[] => {
 };
 
 export const Home = () => {
-  const SOCRATE_DATA_KEY = "socrate-data-key";
-  const classes = useStyles();
-
   const [actual, setActual] = useState(0);
   const [total, setTotal] = useState(0);
   const [items, setItems] = useState<Item[]>([]);
