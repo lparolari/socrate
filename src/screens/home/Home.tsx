@@ -115,15 +115,17 @@ const HistPerHour = ({ data }: { data: HistEntry[] }) => {
     <Paper style={{ padding: 16 }}>
       <Grid container alignItems="flex-start" spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h3">Ultima ora</Typography>
+          <Typography variant="h3">Ultimi 60 minuti</Typography>
         </Grid>
         <Grid item xs={12}>
-          <LineChart width={650} height={300} data={data}>
-            <Line type="monotone" dataKey="value" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="key" />
-            <YAxis />
-          </LineChart>
+          <div style={{ overflowX: "auto", flex: 1.0 }}>
+            <LineChart width={650} height={300} data={data}>
+              <Line type="monotone" dataKey="value" stroke="#8884d8" />
+              <CartesianGrid stroke="#ccc" />
+              <XAxis dataKey="key" />
+              <YAxis />
+            </LineChart>
+          </div>
         </Grid>
       </Grid>
     </Paper>
@@ -330,10 +332,10 @@ export const Home = () => {
         <div className="col-md-12" style={{ marginBottom: 20 }}>
           <Typography variant="h1">Home</Typography>
         </div>
-        <div className="col-md-4">
+        <div className="col-md-4" style={{ marginBottom: 20 }}>
           <ActualCounter actual={actual} threshold={threshold} />
         </div>
-        <div className="col-md-4">
+        <div className="col-md-4" style={{ marginBottom: 20 }}>
           <TotalCounter total={total} />
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
@@ -354,14 +356,13 @@ export const Home = () => {
         </div>
       </div>
       <div className="row">
-        <div className="col-md-8">
+        <div className="col-md-8" style={{ marginBottom: 20 }}>
           <HistPerHour data={histPerHour} />
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
           <Summary data={items} />
         </div>
-        <div className="col-md-4">
-          {" "}
+        <div className="col-md-4" style={{ marginBottom: 20 }}>
           <Paper style={{ padding: 16 }}>
             <Grid container alignItems="flex-start" spacing={2}>
               <Grid item xs={12}>
