@@ -4,8 +4,6 @@ import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { Screens } from "./screens/Screens";
 import { ThresholdContextProvider } from "./providers/threshold";
 
-import ReactGA from "react-ga";
-
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -19,9 +17,6 @@ const theme = createMuiTheme({
     fontSize: 16,
   },
 });
-
-const trackingId = "233043456"; // Replace with your Google Analytics tracking ID
-ReactGA.initialize(trackingId);
 
 function App() {
   return (
