@@ -34,7 +34,7 @@ export const Bootstrap = () => {
           <Paper style={{ padding: 16 }}>
             <Grid container alignItems="flex-start" spacing={2}>
               <Grid item xs={12}>
-                <Typography variant="h3">Iniziamo</Typography>
+                <Typography variant="h3">Avvertenze</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography>
@@ -58,6 +58,15 @@ export const Bootstrap = () => {
                   contenere, in questo modo il sistema può aiutarti nel gestire
                   il carico di affluenza.
                 </Typography>
+                <Typography style={{ marginTop: 20 }}>
+                  <b>Attenzione!</b> Per motivi di privacy tutti i tuoi dati
+                  <b>rimarranno sul tuo computer</b>, di conseguenza quando esci
+                  dal browser ricordati di <b>esportare</b> i tuoi dati. Potrei
+                  importarli successivamente.
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h3">Iniziamo!</Typography>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -68,7 +77,7 @@ export const Bootstrap = () => {
                   onChange={handleChange}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={12}>
                 <Button
                   variant="contained"
                   color="primary"
@@ -89,11 +98,16 @@ export const Bootstrap = () => {
               <p>
                 Build with love by <b>Luca Parolari</b> &nbsp; &copy; 2020{" "}
                 <br />
-                and hosted by{" "}
+                and hosted by <b>Nexio Informatica SRL</b>
+                <br /> (
                 <a href="https://www.nexioinformatica.com/">
-                  Nexio Informatica SRL
+                  https://www.nexioinformatica.com
                 </a>
-                .
+                ,{" "}
+                <a href="mailto:info@nexioinformatica.com">
+                  info@nexioinformatica.com
+                </a>
+                )
                 <br />
                 <br />
                 Email:{" "}
