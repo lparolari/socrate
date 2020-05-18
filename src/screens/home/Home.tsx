@@ -11,9 +11,8 @@ import { TableRow } from "@material-ui/core";
 import { TableCell } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { Divider } from "@material-ui/core";
-import { LineChart } from "recharts";
-import { Line } from "recharts";
-import { CartesianGrid } from "recharts";
+import { BarChart } from "recharts";
+import { Bar } from "recharts";
 import { XAxis } from "recharts";
 import { YAxis } from "recharts";
 import * as Option from "fp-ts/lib/Option";
@@ -26,7 +25,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { red } from "@material-ui/core/colors";
 import { orange } from "@material-ui/core/colors";
 import { green } from "@material-ui/core/colors";
-import { Prompt } from "react-router-dom";
+import { useTheme } from "@material-ui/core/styles";
 
 const Inc = ({ onClick, ...rest }: { onClick: () => void }) => {
   return (
@@ -111,6 +110,9 @@ const TotalCounter = ({ total }: { total: number }) => {
 };
 
 const HistPerHour = ({ data }: { data: HistEntry[] }) => {
+  const classes = useStyles();
+  const theme = useTheme();
+
   return (
     <Paper style={{ padding: 16 }}>
       <Grid container alignItems="flex-start" spacing={2}>
@@ -119,12 +121,29 @@ const HistPerHour = ({ data }: { data: HistEntry[] }) => {
         </Grid>
         <Grid item xs={12}>
           <div style={{ overflowX: "auto", flex: 1.0 }}>
-            <LineChart width={650} height={300} data={data}>
-              <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              <CartesianGrid stroke="#ccc" />
-              <XAxis dataKey="key" />
-              <YAxis />
-            </LineChart>
+            <BarChart
+              width={650}
+              height={300}
+              data={data}
+              style={{ marginBottom: 20 }}
+            >
+              <Bar dataKey="value" fill={theme.palette.primary.main} />
+              <XAxis
+                dataKey="key"
+                label={{
+                  value: "Minuti",
+                  dy: 15,
+                }}
+                interval="preserveEnd"
+              />
+              <YAxis
+                label={{
+                  value: "Ospiti",
+                  angle: -90,
+                }}
+                allowDecimals={false}
+              />
+            </BarChart>
           </div>
         </Grid>
       </Grid>
