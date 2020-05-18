@@ -274,6 +274,7 @@ const buildHist = (minutes: number[]): HistEntry[] => {
 };
 
 export const Home = () => {
+  const SOCRATE_DATA_KEY = "socrate-data-key";
   const classes = useStyles();
 
   const [actual, setActual] = useState(0);
@@ -284,6 +285,13 @@ export const Home = () => {
   const { threshold, setThreshold } = useContext(ThresholdContext);
 
   if (!threshold) throw new Error("Threshold should not be undefined.");
+
+  const reviver = (k: string, v: any) => {
+    if (k === "actual" || k === "total" || k === "threshold")
+      return Number.parseInt(v);
+    if (k === "timestamp") return moment(v);
+    return v;
+  };
 
   const incHandler = () => {
     setActual(actual + 1);
@@ -428,18 +436,7 @@ export const Home = () => {
                         reader.onload = async (e) => {
                           const text: any = e.target ? e.target.result : null;
                           if (text) {
-                            importData(
-                              JSON.parse(text, (k: string, v: any) => {
-                                if (
-                                  k === "actual" ||
-                                  k === "total" ||
-                                  k === "threshold"
-                                )
-                                  return Number.parseInt(v);
-                                if (k === "timestamp") return moment(v);
-                                return v;
-                              })
-                            );
+                            importData(JSON.parse(text, reviver));
                           }
                         };
                         reader.readAsText(e.target.files[0]);
