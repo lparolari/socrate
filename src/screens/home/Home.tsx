@@ -25,7 +25,14 @@ export const Home = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [histPerHour, setHistPerHour] = useState<HistEntry[]>([]);
 
-  const { threshold, setThreshold } = useContext(ThresholdContext);
+  const {
+    threshold,
+    warningRate,
+    dangerRate,
+    setThreshold,
+    setWarningRate,
+    setDangerRate,
+  } = useContext(ThresholdContext);
   const { lastHour, minutes, buildHist } = useContext(CounterContext);
 
   if (!threshold) throw new Error("Threshold should not be undefined.");
@@ -105,7 +112,12 @@ export const Home = () => {
           <Typography variant="h1">Home</Typography>
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
-          <ActualCounter actual={actual} threshold={threshold} />
+          <ActualCounter
+            actual={actual}
+            threshold={threshold}
+            warningRate={warningRate}
+            dangerRate={dangerRate}
+          />
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
           <TotalCounter total={total} />
@@ -141,6 +153,9 @@ export const Home = () => {
                 <Typography variant="h3">Impostazioni</Typography>
               </Grid>
               <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              <Grid item xs={4}>
                 <TextField
                   label="Soglia"
                   type="number"
@@ -148,6 +163,36 @@ export const Home = () => {
                   value={threshold}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setThreshold(Number.parseInt(e.target.value))
+                  }
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Warning Rate"
+                  type="number"
+                  inputProps={{ min: "0", max: "1", step: "0.01" }}
+                  variant="outlined"
+                  value={warningRate}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setWarningRate(
+                      Number.parseFloat(e.target.value ? e.target.value : "0")
+                    )
+                  }
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Danger Rate"
+                  type="number"
+                  inputProps={{ min: "0", max: "1", step: "0.01" }}
+                  variant="outlined"
+                  value={dangerRate}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setDangerRate(
+                      Number.parseFloat(e.target.value ? e.target.value : "0")
+                    )
                   }
                   fullWidth
                 />

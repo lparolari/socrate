@@ -9,13 +9,17 @@ import { success, warning, danger } from "../../util/style";
 export const ActualCounter = ({
   actual,
   threshold,
+  warningRate,
+  dangerRate,
 }: {
   actual: number;
   threshold: number;
+  warningRate: number;
+  dangerRate: number;
 }) => {
   const classes = useStyles();
-  const isWarning = actual > 0.7 * threshold;
-  const isDanger = actual > 0.9 * threshold;
+  const isWarning = actual > warningRate * threshold;
+  const isDanger = actual > dangerRate * threshold;
   const alert = !isWarning
     ? classes.success
     : !isDanger
