@@ -308,6 +308,7 @@ export const Home = () => {
   const resetHandler = () => {
     setActual(0);
     setTotal(0);
+    setItems([]);
   };
 
   useEffect(() => {
