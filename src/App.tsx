@@ -5,6 +5,13 @@ import { Screens } from "./screens/Screens";
 import { ThresholdContextProvider } from "./providers/threshold";
 import { theme } from "./util/style";
 
+import * as firebase from "firebase/app";
+import "firebase/analytics";
+import { firebaseConfig } from "./util/firebase";
+
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+
 function App() {
   return (
     <BrowserRouter>
