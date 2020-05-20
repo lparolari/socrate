@@ -1,7 +1,10 @@
 # Socrate
 
 > Real Time Social Management: keep under control overcrowding in your spaces.
+>
 > Try it [http://socrate.nexioapp.com/](http://socrate.nexioapp.com/)
+
+![Socrate](/.github/img/socrate.gif)
 
 _Socrate_, imaginative acronym of Real Time Social Management, is a simple tool with the aim of helping people
 keep tracking of overcrowding, as required from the italian governement after COVID-19 provisions of May 18, 2020.
