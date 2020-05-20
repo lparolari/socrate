@@ -1,13 +1,14 @@
-export interface Item {
+export interface Passage {
   timestamp: moment.Moment;
 }
 
-export interface ItemIn extends Item {}
-
-export interface ItemOut extends Item {}
-
-export interface Info {}
-
 export interface Threshold {
   threshold: number;
+}
+
+export type Hist = HistEntry[];
+
+export interface HistEntry {
+  key: number;
+  value: number;
 }

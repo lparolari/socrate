@@ -8,6 +8,7 @@ import { theme } from "./util/style";
 import * as firebase from "firebase/app";
 import "firebase/analytics";
 import { firebaseConfig } from "./util/firebase";
+import { CounterContextProvider } from "./providers/counter";
 
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
@@ -17,9 +18,11 @@ function App() {
     <BrowserRouter>
       <MuiThemeProvider theme={theme}>
         <ThresholdContextProvider>
-          <div className="container" style={{ marginTop: 20 }}>
-            <Screens />
-          </div>
+          <CounterContextProvider>
+            <div className="container" style={{ marginTop: 20 }}>
+              <Screens />
+            </div>
+          </CounterContextProvider>
         </ThresholdContextProvider>
       </MuiThemeProvider>
     </BrowserRouter>

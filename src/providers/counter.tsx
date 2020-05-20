@@ -1,125 +1,81 @@
-import React, { createContext } from "react";
+import React, { createContext, useState } from "react";
 import moment from "moment";
-import { pipe } from "fp-ts/lib/pipeable";
-import * as Option from "fp-ts/lib/Option";
-import * as Array from "fp-ts/lib/Array";
-import * as NonEmptyArray from "fp-ts/lib/NonEmptyArray";
-import * as _ from "lodash";
+import { Passage } from "../types";
+import { noop } from "../util/noop";
 
-export interface Item {
-  timestamp: moment.Moment;
-}
-
-export interface HistEntry {
-  key: number;
-  value: number;
-}
-
-const meanLastMin = (min: number, items: Item[]): number =>
-  pipe(
-    items,
-    lastMin(min),
-    minutes,
-    bins(60),
-    Array.filter((x: number) => x !== 0),
-    NonEmptyArray.fromArray,
-    Option.fold(
-      () => 0,
-      (x: number[]) => _.mean(x)
-    )
-  );
-
-const guestLastMin = (min: number, items: Item[]): number => {
-  return pipe(items, (x: Item[]) => lastMin(min)(x), count);
-};
-
-const histLastMin = (min: number, items: Item[]): HistEntry[] => {
-  return pipe(items, lastHour, minutes, buildHist);
+const makePassage = (): Passage => {
+  return { timestamp: moment() };
 };
 
 interface Context {
-  meanLastMin: (min: number, items: Item[]) => number;
-  guestLastMin: (min: number, items: Item[]) => number;
-  histLastMin: (min: number, items: Item[]) => HistEntry[];
+  actual: number;
+  total: number;
+  passages: Passage[];
+  inc: () => void;
+  dec: () => void;
+  reset: () => void;
+  bulkImport: (actual: number, total: number, passages: Passage[]) => void;
 }
 
-const ctx = {
-  meanLastMin: meanLastMin,
-  guestLastMin: guestLastMin,
-  histLastMin: histLastMin,
-};
+// Create context with default values.
+export const CounterContext = createContext<Context>({
+  actual: 0,
+  total: 0,
+  passages: [],
+  inc: noop,
+  dec: noop,
+  reset: noop,
+  bulkImport: noop,
+});
 
-export const CounterContext = createContext<Context>(ctx);
-
+// Create context provider and bind the context.
 export const CounterContextProvider = ({
   children,
 }: {
   children: JSX.Element;
 }): React.ReactElement => {
+  const [actual, setActual] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [passages, setPassages] = useState<Passage[]>([]);
+
+  const inc = () => {
+    console.log("AAA");
+    setActual(actual + 1);
+    setTotal(total + 1);
+    setPassages([...passages, makePassage()]);
+  };
+
+  const dec = () => {
+    if (actual <= 0) return;
+
+    setActual(actual - 1);
+  };
+
+  const reset = () => {
+    setActual(0);
+    setTotal(0);
+    setPassages([]);
+  };
+
+  const bulkImport = (actual: number, total: number, passages: Passage[]) => {
+    setActual(actual);
+    setTotal(total);
+    setPassages(passages);
+  };
+
   return (
-    <CounterContext.Provider value={ctx}>{children}</CounterContext.Provider>
+    <CounterContext.Provider
+      value={{
+        actual: actual,
+        total: total,
+        passages: passages,
+        inc: inc,
+        dec: dec,
+        reset: reset,
+        bulkImport: bulkImport,
+      }}
+    >
+      {children}
+    </CounterContext.Provider>
   );
-};
-
-// HELPERS
-
-const count = <T,>(xs: T[]): number => xs.length;
-
-/**
- * Return items with timestamp between `min` minutes ago and now.
- * @param items
- */
-const lastMin = (min: number) => (items: Item[]) =>
-  pipe(
-    items,
-    Array.filter((x: Item) =>
-      x.timestamp.isAfter(moment().subtract(min, "minute"))
-    )
-  );
-
-/**
- * Return items with timestamp between an hour ago and now.
- * @param items
- */
-const lastHour = lastMin(60);
-
-/**
- * Map list items to minute corresponding to their timestamp.
- * @param items
- */
-const minutes = (items: Item[]): number[] => {
-  return pipe(
-    items,
-    Array.map((x) => x.timestamp.minute())
-  );
-};
-
-/**
- * Create `n` bins from `data`, counting duplicate elements and storing them in their bin.
- * @param n
- * @param data
- */
-const bins = (n: number) => (data: number[]): number[] => {
-  const bins: number[] = Array.replicate(n, 0);
-  for (const m of data) {
-    bins[m] = bins[m] + 1;
-  }
-  return bins;
-};
-
-const buildHist = (minutes: number[]): HistEntry[] => {
-  // @param minutes An array of numbers from 0 to 59 with repetitions.
-
-  const mbins = bins(60)(minutes);
-
-  const now = moment();
-
-  let hist: HistEntry[] = [];
-  for (let i = now.minute() + 60; i >= now.minute() + 1; i--) {
-    hist = [...hist, { key: i % 60, value: mbins[i % 60] }];
-  }
-
-  hist = _.reverse(hist);
-
-  return hist;
 };

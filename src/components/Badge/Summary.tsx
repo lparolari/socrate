@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Typography } from "@material-ui/core";
 import { Paper } from "@material-ui/core";
 import { Grid } from "@material-ui/core";
@@ -7,12 +7,10 @@ import { TableBody } from "@material-ui/core";
 import { TableRow } from "@material-ui/core";
 import { TableCell } from "@material-ui/core";
 
-import { Item } from "../../types";
-import { CounterContext } from "../../providers/counter";
+import { guestLastMin, meanLastMin } from "../../data/counter";
+import { Passage } from "../../types";
 
-export const Summary = ({ data }: { data: Item[] }) => {
-  const { guestLastMin, meanLastMin } = useContext(CounterContext);
-
+export const Summary = ({ data }: { data: Passage[] }) => {
   return (
     <Paper style={{ padding: 16 }}>
       <Grid container alignItems="flex-start" spacing={2}>

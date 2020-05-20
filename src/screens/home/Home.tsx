@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import moment from "moment";
 import { Typography } from "@material-ui/core";
 import { Paper } from "@material-ui/core";
@@ -8,22 +8,18 @@ import { ButtonGroup } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { Divider } from "@material-ui/core";
 import { ThresholdContext } from "../../providers/threshold";
-import { Item } from "../../types";
-import { HistEntry, CounterContext } from "../../providers/counter";
+import { CounterContext } from "../../providers/counter";
 import { ActualCounter } from "../../components/Badge/ActualCounter";
 import { TotalCounter } from "../../components/Badge/TotalCounter";
 import { Inc } from "../../components/Button/Inc";
 import { Dec } from "../../components/Button/Dec";
 import { Reset } from "../../components/Button/Reset";
-import { HistPerHour } from "../../components/HistPerHour/HistPerHour";
 import { Summary } from "../../components/Badge/Summary";
+import { Passage } from "../../types";
+import { reviver } from "../../util/json";
+import { PassagesChart } from "../../components/PassagesChart/PassagesChart";
 
 export const Home = () => {
-  const [actual, setActual] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [items, setItems] = useState<Item[]>([]);
-  const [histPerHour, setHistPerHour] = useState<HistEntry[]>([]);
-
   const {
     threshold,
     warningRate,
@@ -32,48 +28,18 @@ export const Home = () => {
     setWarningRate,
     setDangerRate,
   } = useContext(ThresholdContext);
-  const { histLastMin } = useContext(CounterContext);
 
   if (!threshold) throw new Error("Threshold should not be undefined.");
 
-  const reviver = (k: string, v: any) => {
-    if (k === "actual" || k === "total" || k === "threshold")
-      return Number.parseInt(v);
-    if (k === "timestamp") return moment(v);
-    return v;
-  };
-
-  const incHandler = () => {
-    setActual(actual + 1);
-    setTotal(total + 1);
-    setItems([...items, { timestamp: moment() }]);
-  };
-
-  const decHandler = () => {
-    if (actual <= 0) return;
-
-    setActual(actual - 1);
-  };
-
-  const resetHandler = () => {
-    setActual(0);
-    setTotal(0);
-    setItems([]);
-  };
-
-  useEffect(() => {
-    setHistPerHour(histLastMin(60, items));
-  }, [items, histLastMin]);
-
-  useEffect(() => {
-    setInterval(() => setHistPerHour(histLastMin(60, items)), 1000 * 60);
-  }, [items, histLastMin]);
+  const { actual, total, passages, inc, dec, reset, bulkImport } = useContext(
+    CounterContext
+  );
 
   const exportData = async () => {
     const data = {
       actual: actual,
       total: total,
-      items: items,
+      passages: passages,
       threshold: threshold,
     };
     // json
@@ -92,12 +58,10 @@ export const Home = () => {
   const importData = (obj: {
     actual: number;
     total: number;
-    items: Item[];
+    passages: Passage[];
     threshold: number;
   }) => {
-    setActual(obj.actual);
-    setTotal(obj.total);
-    setItems(obj.items);
+    bulkImport(obj.actual, obj.total, obj.passages);
     setThreshold(obj.threshold);
   };
 
@@ -125,10 +89,10 @@ export const Home = () => {
                 <Typography variant="h3">Azioni</Typography>
                 <div style={{ marginTop: 10 }}>
                   <ButtonGroup variant="outlined" color="primary">
-                    <Inc onClick={() => incHandler()} />
-                    <Dec onClick={() => decHandler()} />
+                    <Inc onClick={() => inc()} />
+                    <Dec onClick={() => dec()} />
                   </ButtonGroup>
-                  <Reset onClick={() => resetHandler()} />
+                  <Reset onClick={() => reset()} />
                 </div>
               </Grid>
             </Grid>
@@ -137,10 +101,10 @@ export const Home = () => {
       </div>
       <div className="row">
         <div className="col-md-8" style={{ marginBottom: 20 }}>
-          <HistPerHour data={histPerHour} />
+          <PassagesChart />
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
-          <Summary data={items} />
+          <Summary data={passages} />
         </div>
         <div className="col-md-4" style={{ marginBottom: 20 }}>
           <Paper style={{ padding: 16 }}>
@@ -170,11 +134,15 @@ export const Home = () => {
                   inputProps={{ min: "0", max: "1", step: "0.01" }}
                   variant="outlined"
                   value={warningRate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setWarningRate(
-                      Number.parseFloat(e.target.value ? e.target.value : "0")
-                    )
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const newWarningRate = Number.parseFloat(
+                      e.target.value ? e.target.value : "0"
+                    );
+                    if (newWarningRate > dangerRate) {
+                      setDangerRate(newWarningRate);
+                    }
+                    setWarningRate(newWarningRate);
+                  }}
                   fullWidth
                 />
               </Grid>
@@ -185,11 +153,15 @@ export const Home = () => {
                   inputProps={{ min: "0", max: "1", step: "0.01" }}
                   variant="outlined"
                   value={dangerRate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setDangerRate(
-                      Number.parseFloat(e.target.value ? e.target.value : "0")
-                    )
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const newDangerRate = Number.parseFloat(
+                      e.target.value ? e.target.value : "0"
+                    );
+                    if (newDangerRate < warningRate) {
+                      setWarningRate(newDangerRate);
+                    }
+                    setDangerRate(newDangerRate);
+                  }}
                   fullWidth
                 />
               </Grid>
