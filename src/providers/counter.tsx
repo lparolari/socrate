@@ -15,14 +15,12 @@ export interface HistEntry {
   value: number;
 }
 
-const count = <T,>(xs: T[]): number => xs.length;
-
-const meanLastHour = (items: Item[]): number =>
+const meanLastMin = (min: number, items: Item[]): number =>
   pipe(
     items,
-    lastHour,
+    lastMin(min),
     minutes,
-    (minutes: number[]) => bins(60, minutes),
+    bins(60),
     Array.filter((x: number) => x !== 0),
     NonEmptyArray.fromArray,
     Option.fold(
@@ -31,25 +29,59 @@ const meanLastHour = (items: Item[]): number =>
     )
   );
 
-/**
- * Return items with timestamp between an hour ago and now.
- * @param items
- */
-const lastHour = (items: Item[]): Item[] => {
-  return pipe(
-    items,
-    Array.filter((x: Item) => x.timestamp.isAfter(moment().subtract(1, "hour")))
+const guestLastMin = (min: number, items: Item[]): number => {
+  return pipe(items, (x: Item[]) => lastMin(min)(x), count);
+};
+
+const histLastMin = (min: number, items: Item[]): HistEntry[] => {
+  return pipe(items, lastHour, minutes, buildHist);
+};
+
+interface Context {
+  meanLastMin: (min: number, items: Item[]) => number;
+  guestLastMin: (min: number, items: Item[]) => number;
+  histLastMin: (min: number, items: Item[]) => HistEntry[];
+}
+
+const ctx = {
+  meanLastMin: meanLastMin,
+  guestLastMin: guestLastMin,
+  histLastMin: histLastMin,
+};
+
+export const CounterContext = createContext<Context>(ctx);
+
+export const CounterContextProvider = ({
+  children,
+}: {
+  children: JSX.Element;
+}): React.ReactElement => {
+  return (
+    <CounterContext.Provider value={ctx}>{children}</CounterContext.Provider>
   );
 };
 
-const lastMin = (min: number, items: Item[]): Item[] => {
-  return pipe(
+// HELPERS
+
+const count = <T,>(xs: T[]): number => xs.length;
+
+/**
+ * Return items with timestamp between `min` minutes ago and now.
+ * @param items
+ */
+const lastMin = (min: number) => (items: Item[]) =>
+  pipe(
     items,
     Array.filter((x: Item) =>
       x.timestamp.isAfter(moment().subtract(min, "minute"))
     )
   );
-};
+
+/**
+ * Return items with timestamp between an hour ago and now.
+ * @param items
+ */
+const lastHour = lastMin(60);
 
 /**
  * Map list items to minute corresponding to their timestamp.
@@ -67,7 +99,7 @@ const minutes = (items: Item[]): number[] => {
  * @param n
  * @param data
  */
-const bins = (n: number, data: number[]): number[] => {
+const bins = (n: number) => (data: number[]): number[] => {
   const bins: number[] = Array.replicate(n, 0);
   for (const m of data) {
     bins[m] = bins[m] + 1;
@@ -78,7 +110,7 @@ const bins = (n: number, data: number[]): number[] => {
 const buildHist = (minutes: number[]): HistEntry[] => {
   // @param minutes An array of numbers from 0 to 59 with repetitions.
 
-  const mbins = bins(60, minutes);
+  const mbins = bins(60)(minutes);
 
   const now = moment();
 
@@ -90,40 +122,4 @@ const buildHist = (minutes: number[]): HistEntry[] => {
   hist = _.reverse(hist);
 
   return hist;
-};
-
-const guestLastMin = (min: number, items: Item[]): number => {
-  return pipe(items, (x: Item[]) => lastMin(5, x), count);
-};
-
-interface Context {
-  meanLastHour: (items: Item[]) => number;
-  guestLastMin: (min: number, items: Item[]) => number;
-  lastHour: (items: Item[]) => Item[];
-  lastMin: (min: number, items: Item[]) => Item[];
-  minutes: (items: Item[]) => number[];
-  bins: (n: number, data: number[]) => number[];
-  buildHist: (minutes: number[]) => HistEntry[];
-}
-
-const ctx = {
-  meanLastHour: meanLastHour,
-  guestLastMin: guestLastMin,
-  lastHour: lastHour,
-  lastMin: lastMin,
-  minutes: minutes,
-  bins: bins,
-  buildHist: buildHist,
-};
-
-export const CounterContext = createContext<Context>(ctx);
-
-export const CounterContextProvider = ({
-  children,
-}: {
-  children: JSX.Element;
-}): React.ReactElement => {
-  return (
-    <CounterContext.Provider value={ctx}>{children}</CounterContext.Provider>
-  );
 };

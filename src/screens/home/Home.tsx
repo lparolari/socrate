@@ -7,7 +7,6 @@ import { Button } from "@material-ui/core";
 import { ButtonGroup } from "@material-ui/core";
 import { TextField } from "@material-ui/core";
 import { Divider } from "@material-ui/core";
-import { pipe } from "fp-ts/lib/pipeable";
 import { ThresholdContext } from "../../providers/threshold";
 import { Item } from "../../types";
 import { HistEntry, CounterContext } from "../../providers/counter";
@@ -33,7 +32,7 @@ export const Home = () => {
     setWarningRate,
     setDangerRate,
   } = useContext(ThresholdContext);
-  const { lastHour, minutes, buildHist } = useContext(CounterContext);
+  const { histLastMin } = useContext(CounterContext);
 
   if (!threshold) throw new Error("Threshold should not be undefined.");
 
@@ -63,15 +62,12 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    setHistPerHour(pipe(items, lastHour, minutes, buildHist));
-  }, [items, lastHour, minutes, buildHist]);
+    setHistPerHour(histLastMin(60, items));
+  }, [items, histLastMin]);
 
   useEffect(() => {
-    setInterval(
-      () => setHistPerHour(pipe(items, lastHour, minutes, buildHist)),
-      1000 * 60
-    );
-  }, [items, lastHour, minutes, buildHist]);
+    setInterval(() => setHistPerHour(histLastMin(60, items)), 1000 * 60);
+  }, [items, histLastMin]);
 
   const exportData = async () => {
     const data = {

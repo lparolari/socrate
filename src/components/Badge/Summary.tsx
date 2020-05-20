@@ -11,7 +11,7 @@ import { Item } from "../../types";
 import { CounterContext } from "../../providers/counter";
 
 export const Summary = ({ data }: { data: Item[] }) => {
-  const { guestLastMin, meanLastHour } = useContext(CounterContext);
+  const { guestLastMin, meanLastMin } = useContext(CounterContext);
 
   return (
     <Paper style={{ padding: 16 }}>
@@ -35,7 +35,7 @@ export const Summary = ({ data }: { data: Item[] }) => {
                   <Typography>Media ultima ora</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography>{meanLastHour(data).toFixed(2)}</Typography>
+                  <Typography>{meanLastMin(60, data).toFixed(2)}</Typography>
                 </TableCell>
               </TableRow>
             </TableBody>
